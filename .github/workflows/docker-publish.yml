@@ -6,7 +6,7 @@ on:
       - main
       - master
     tags:
-      - 'v*'
+      - 'v*.*.*'  # Triggered by semantic version tags from commit-and-tag-version
   pull_request:
     branches:
       - main
@@ -44,11 +44,16 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
+            # For git tags (created by commit-and-tag-version):
+            # v1.2.3 → 1.2.3, 1.2, 1, latest
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
+            # For branch pushes: main → main
+            type=ref,event=branch
+            # For PRs: pr-123
+            type=ref,event=pr
+            # Always tag latest on main/master branch
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image

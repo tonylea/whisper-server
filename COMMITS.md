@@ -110,7 +110,9 @@ npm run release:major
 git push --follow-tags origin main
 ```
 
-## Workflow Example
+## Complete Workflow Example
+
+### Development and Release Cycle
 
 ```bash
 # 1. Create feature branch
@@ -123,8 +125,37 @@ git commit -m "feat: add new transcription format"
 # 3. Push branch and create PR
 git push origin feat/new-feature
 
-# 4. After PR is merged to main, create release
-# Use GitHub Actions workflow or local npm commands
+# 4. After PR is merged to main, create release (maintainers only)
+# Option A: Via GitHub Actions
+# - Go to Actions → "Automated Release" → Run workflow → Select patch/minor/major
+
+# Option B: Via local npm
+npm install
+npm run release:minor  # Creates v1.1.0 tag
+git push --follow-tags origin main
+
+# 5. Automated Docker Build is triggered
+# When the git tag (e.g., v1.1.0) is pushed, the Docker workflow automatically:
+# - Builds the Docker image
+# - Tags it as: 1.1.0, 1.1, 1, latest
+# - Pushes to Docker Hub
+```
+
+### What Happens During a Release
+
+1. **Changelog Generation**: CHANGELOG.md is updated with all commits since last release
+2. **Version Bump**: package.json version is bumped (1.0.0 → 1.1.0)
+3. **Git Tag Created**: A tag like `v1.1.0` is created
+4. **Commit & Push**: Changes are committed and pushed with the tag
+5. **Docker Build Triggered**: The tag push triggers the Docker workflow
+6. **Multi-Tag Docker Images**: Image is tagged with `1.1.0`, `1.1`, `1`, and `latest`
+7. **Published**: Docker images are available on Docker Hub
+
+Users can then pull the new version:
+
+```bash
+docker pull deadrobot/whisper-server:1.1.0  # Specific version
+docker pull deadrobot/whisper-server:latest # Always latest
 ```
 
 ## Version Bumping Logic

@@ -210,23 +210,57 @@ Once the server is running, visit:
 
 3. Create releases using the Automated Release workflow:
 
-   - Go to Actions → Automated Release
+   **Via GitHub Actions (Recommended):**
+
+   - Go to Actions → "Automated Release"
    - Click "Run workflow"
    - Select release type (patch/minor/major)
-   - The workflow will automatically create tags and trigger Docker builds
+   - The workflow will:
+     - Generate/update CHANGELOG.md based on conventional commits
+     - Bump version in package.json
+     - Create a git tag (e.g., `v1.2.3`)
+     - Push changes and tag to repository
+     - Automatically trigger the Docker build workflow
 
-   Alternatively, you can create releases locally:
+   **Via Local Development:**
 
    ```bash
    # Install Node.js dependencies
    npm install
 
    # Create a release (updates version, changelog, and creates tag)
-   npm run release:patch  # or release:minor or release:major
+   npm run release:patch  # 1.0.0 → 1.0.1
+   npm run release:minor  # 1.0.0 → 1.1.0
+   npm run release:major  # 1.0.0 → 2.0.0
 
    # Push changes and tags
    git push --follow-tags origin main
    ```
+
+### Docker Image Tagging
+
+When a git tag is created (e.g., `v1.2.3`), the Docker workflow automatically builds and pushes images with multiple tags:
+
+- `deadrobot/whisper-server:1.2.3` - Full version
+- `deadrobot/whisper-server:1.2` - Minor version
+- `deadrobot/whisper-server:1` - Major version
+- `deadrobot/whisper-server:latest` - Latest stable release
+
+This allows users to pin to specific versions or always use the latest:
+
+```bash
+# Use specific version (recommended for production)
+docker pull deadrobot/whisper-server:1.2.3
+
+# Use minor version (gets patch updates)
+docker pull deadrobot/whisper-server:1.2
+
+# Use major version (gets minor and patch updates)
+docker pull deadrobot/whisper-server:1
+
+# Always use latest (gets all updates)
+docker pull deadrobot/whisper-server:latest
+```
 
 ## Performance Tips
 
