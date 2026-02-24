@@ -1,9 +1,24 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## 2.0.0 (2026-02-24)
+
+
+### Features
+
+* **ci:** add automated versioning and release workflow ([d1b24bb](https://github.com/tonylea/whisper-server/commit/d1b24bb9ec8b1154f6d298890041ca5135fa31dc))
+* **ci:** integrate Docker tagging with automated releases ([f7cafb3](https://github.com/tonylea/whisper-server/commit/f7cafb399c16960802231f5bd35e2bc7090823f6))
+
+
+### Maintenance
+
+* update gitignore for Node.js and Claude CLI ([a3ff6bc](https://github.com/tonylea/whisper-server/commit/a3ff6bca67aab4fdf223e5920ec6feb44912f23d))
+
+
+### Documentation
+
+* add conventional commits guide and update README ([1659196](https://github.com/tonylea/whisper-server/commit/1659196883f441277616f2b6f5e86eb23c680913))
 
 ## [1.0.0] - 2026-02-24
 

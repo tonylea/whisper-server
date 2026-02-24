@@ -1,6 +1,6 @@
 {
   "name": "whisper-server",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "OpenAI Whisper-compatible transcription API using faster-whisper",
   "repository": {
     "type": "git",
