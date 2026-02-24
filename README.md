@@ -206,13 +206,26 @@ Once the server is running, visit:
 2. Add the following secrets:
 
    - `DOCKERHUB_USERNAME`: Your Docker Hub username
-   - `DOCKERHUB_TOKEN`: Your Docker Hub access token (create at https://hub.docker.com/settings/security)
+   - `DOCKERHUB_TOKEN`: Your Docker Hub access token (create at [Docker Hub Security](https://hub.docker.com/settings/security))
 
-3. Push to main/master or create a tag to trigger the build:
+3. Create releases using the Automated Release workflow:
+
+   - Go to Actions → Automated Release
+   - Click "Run workflow"
+   - Select release type (patch/minor/major)
+   - The workflow will automatically create tags and trigger Docker builds
+
+   Alternatively, you can create releases locally:
 
    ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
+   # Install Node.js dependencies
+   npm install
+
+   # Create a release (updates version, changelog, and creates tag)
+   npm run release:patch  # or release:minor or release:major
+
+   # Push changes and tags
+   git push --follow-tags origin main
    ```
 
 ## Performance Tips
@@ -230,6 +243,29 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Conventional Commits
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) for commit messages and automated versioning. Please follow the commit message format:
+
+```bash
+feat: add new feature
+fix: resolve bug
+docs: update documentation
+chore: maintenance tasks
+```
+
+See [COMMITS.md](COMMITS.md) for detailed guidelines and examples.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Make changes using conventional commits
+4. Push and create a Pull Request
+5. Once merged, maintainers will create releases using the automated release workflow
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ## Acknowledgments
 
