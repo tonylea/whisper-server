@@ -1,0 +1,242 @@
+# Whisper Transcription Server
+
+A lightweight, OpenAI-compatible audio transcription API server powered by [faster-whisper](https://github.com/SYSTRAN/faster-whisper). This Docker-based service provides fast and efficient audio transcription using OpenAI's Whisper models.
+
+## Features
+
+- OpenAI API-compatible endpoint (`/v1/audio/transcriptions`)
+- Background processing for efficient transcription
+- Configurable Whisper models (tiny to large)
+- Docker-based deployment for easy setup
+- Persistent output directory for transcriptions
+- FFmpeg integration for audio metadata extraction
+- Fully configurable via environment variables
+
+## Quick Start
+
+### Using Docker Compose (Recommended)
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/tonylea/whisper-server.git
+   cd whisper-server
+   ```
+
+1. (Optional) Copy and customize the environment file:
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your preferred settings
+   ```
+
+1. Start the server:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+The server will be available at `http://localhost:8000`.
+
+### Using Docker
+
+Build and run the container:
+
+```bash
+docker build -t whisper-server .
+docker run -d -p 8000:8000 -v $(pwd)/output:/transcription/output whisper-server
+```
+
+### Using Docker Hub
+
+Pull and run the pre-built image:
+
+```bash
+docker pull deadrobot/whisper-server:latest
+docker run -d -p 8000:8000 -v $(pwd)/output:/transcription/output deadrobot/whisper-server:latest
+```
+
+## Configuration
+
+Configure the server using environment variables:
+
+| Variable        | Default                 | Description                         |
+| --------------- | ----------------------- | ----------------------------------- |
+| `WHISPER_MODEL` | `medium.en`             | Whisper model to use (see below)    |
+| `DEVICE`        | `cpu`                   | Device to run on (`cpu` or `cuda`)  |
+| `COMPUTE_TYPE`  | `int8`                  | Computation precision (see below)   |
+| `OUTPUT_DIR`    | `/transcription/output` | Directory for transcription outputs |
+| `PORT`          | `8000`                  | Server port                         |
+| `HOST`          | `0.0.0.0`               | Server host                         |
+
+### Available Whisper Models
+
+- `tiny`, `tiny.en`
+- `base`, `base.en`
+- `small`, `small.en`
+- `medium`, `medium.en`
+- `large-v1`, `large-v2`, `large-v3`
+
+English-only models (`.en`) are faster and more accurate for English audio.
+
+### Compute Types
+
+- `int8` - Best for CPU (recommended)
+- `int8_float16` - Mixed precision
+- `int16` - Higher precision
+- `float16` - GPU optimized
+- `float32` - Highest precision
+
+## API Usage
+
+### Transcribe Audio
+
+**Endpoint:** `POST /v1/audio/transcriptions`
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:8000/v1/audio/transcriptions \
+  -F "file=@audio.mp3" \
+  -F "model=medium.en"
+```
+
+**Response:**
+
+```json
+{
+  "status": "processing",
+  "message": "Transcription started for audio.mp3",
+  "model": "medium.en",
+  "audio_duration": "3m 45s",
+  "output_file": "/transcription/output/audio.txt"
+}
+```
+
+The transcription is processed in the background. Results are saved to the `output_file` location.
+
+**Note:** You can specify different Whisper models per request using the `model` parameter. If not specified, it defaults to the `WHISPER_MODEL` environment variable. Models are cached in memory after first use for better performance.
+
+**Using different models:**
+
+```bash
+# Use tiny model for faster transcription
+curl -X POST http://localhost:8000/v1/audio/transcriptions \
+  -F "file=@audio.mp3" \
+  -F "model=tiny.en"
+
+# Use large model for better accuracy
+curl -X POST http://localhost:8000/v1/audio/transcriptions \
+  -F "file=@audio.mp3" \
+  -F "model=large-v3"
+```
+
+### Supported Audio Formats
+
+Any format supported by FFmpeg:
+
+- MP3
+- WAV
+- M4A
+- FLAC
+- OGG
+- And many more...
+
+## API Documentation
+
+Once the server is running, visit:
+
+- Interactive API docs: `http://localhost:8000/docs`
+- Alternative docs: `http://localhost:8000/redoc`
+
+## Development
+
+### Local Setup with Virtual Environment
+
+1. Clone the repository and create a virtual environment:
+
+   ```bash
+   git clone https://github.com/tonylea/whisper-server.git
+   cd whisper-server
+
+   # Create virtual environment
+   python -m venv venv
+
+   # Activate virtual environment
+   # On macOS/Linux:
+   source venv/bin/activate
+   # On Windows:
+   # venv\Scripts\activate
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Ensure FFmpeg is installed:
+
+   ```bash
+   # macOS
+   brew install ffmpeg
+
+   # Ubuntu/Debian
+   sudo apt-get install ffmpeg
+
+   # Windows
+   # Download from https://ffmpeg.org/download.html
+   ```
+
+4. Run the server:
+
+   ```bash
+   uvicorn server:app --reload
+   ```
+
+5. When done, deactivate the virtual environment:
+
+   ```bash
+   deactivate
+   ```
+
+### Setup GitHub Actions
+
+1. Go to your GitHub repository Settings → Secrets and variables → Actions
+2. Add the following secrets:
+
+   - `DOCKERHUB_USERNAME`: Your Docker Hub username
+   - `DOCKERHUB_TOKEN`: Your Docker Hub access token (create at https://hub.docker.com/settings/security)
+
+3. Push to main/master or create a tag to trigger the build:
+
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+## Performance Tips
+
+- Use English-only models (`.en`) for English audio - they're faster and more accurate
+- For CPU: Use `int8` compute type
+- For GPU: Use `float16` or `int8_float16` compute type with `DEVICE=cuda`
+- Larger models are more accurate but slower
+- Consider using `tiny` or `base` models for real-time applications
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgments
+
+- [OpenAI Whisper](https://github.com/openai/whisper) - Original Whisper model
+- [faster-whisper](https://github.com/SYSTRAN/faster-whisper) - Optimized Whisper implementation
+- [FastAPI](https://fastapi.tiangolo.com/) - Modern web framework
+
+## Support
+
+If you encounter any issues or have questions, please [open an issue](https://github.com/tonylea/whisper-server/issues) on GitHub.

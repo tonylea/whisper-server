@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  whisper-server:
+    build: .
+    container_name: whisper-server
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - ./output:/transcription/output
+    environment:
+      - WHISPER_MODEL=${WHISPER_MODEL:-medium.en}
+      - DEVICE=${DEVICE:-cpu}
+      - COMPUTE_TYPE=${COMPUTE_TYPE:-int8}
+      - OUTPUT_DIR=${OUTPUT_DIR:-/transcription/output}
+      - PORT=${PORT:-8000}
+      - HOST=${HOST:-0.0.0.0}
+    restart: unless-stopped
