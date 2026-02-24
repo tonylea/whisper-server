@@ -1,0 +1,20 @@
+{
+  "name": "whisper-server",
+  "version": "1.0.0",
+  "description": "OpenAI Whisper-compatible transcription API using faster-whisper",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tonylea/whisper-server.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "release": "commit-and-tag-version",
+    "release:minor": "commit-and-tag-version --release-as minor",
+    "release:major": "commit-and-tag-version --release-as major",
+    "release:patch": "commit-and-tag-version --release-as patch"
+  },
+  "devDependencies": {
+    "commit-and-tag-version": "^12.4.4"
+  }
+}

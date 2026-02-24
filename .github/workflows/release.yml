@@ -1,0 +1,56 @@
+name: Automated Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: 'patch'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate changelog and bump version
+        run: |
+          if [ "${{ github.event.inputs.release-type }}" = "patch" ]; then
+            npm run release:patch
+          elif [ "${{ github.event.inputs.release-type }}" = "minor" ]; then
+            npm run release:minor
+          elif [ "${{ github.event.inputs.release-type }}" = "major" ]; then
+            npm run release:major
+          else
+            npm run release
+          fi
+
+      - name: Push changes
+        run: |
+          git push --follow-tags origin main
